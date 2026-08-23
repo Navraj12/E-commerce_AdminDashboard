@@ -1,10 +1,27 @@
 import { Status } from './status';
 
 export interface User{
-    id : string, 
-    email : string, 
-    username : string, 
+    id : string,
+    email : string,
+    username : string,
+    role? : string,
     created_at : string
+}
+
+export interface Coupon{
+    id : string,
+    code : string,
+    discountPercent : number,
+    expiryDate : string,
+    active : boolean
+}
+
+export interface DashboardStats{
+    totalRevenue : number,
+    totalOrders : number,
+    totalProducts : number,
+    totalUsers : number,
+    recentOrders : any[]
 }
 
 
@@ -21,7 +38,10 @@ export interface Product{
     userId : string, 
     categoryId : string, 
     User? : User,
-    Category? : Category
+    Category? : Category,
+    isFeatured? : boolean | null,
+    originalPrice? : number | null,
+    discountPercent? : number | null
 
 }
 export enum PaymentMethod{
@@ -46,17 +66,21 @@ export interface ItemDetails{
     quantity : number
 }
  export interface OrderData{
-    phoneNumber : string, 
-    shippingAddress : string, 
-    totalAmount : number, 
-    paymentDetails : Payment,
-    items : ItemDetails[], 
-    id : string, 
-    orderStatus : OrderStatus
+    phoneNumber : string,
+    shippingAddress : string,
+    totalAmount : number,
+    paymentDetails? : Payment,
+    Payment? : { paymentMethod : string, paymentStatus : string },
+    User? : { id : string, username : string, email : string },
+    items? : ItemDetails[],
+    id : string,
+    orderStatus : OrderStatus,
+    createdAt? : string
 }
 export interface Category{
-    id : string, 
-    categoryName : string
+    id : string,
+    categoryName : string,
+    categoryIcon? : string | null
 }
 
 export interface SingleOrder{
@@ -81,23 +105,29 @@ export interface SingleOrder{
         shippingAddress: string,
         totalAmount: number,
         orderStatus: OrderStatus,
-        userId : string, 
+        userId : string,
         Payment: {
             paymentMethod: string,
             paymentStatus: string
         },
+        User? : {
+            username : string,
+            email : string
+        }
 
     }
 }
 
 export interface InititalState{
-    products : Product[], 
+    products : Product[],
     users : User[],
-    orders : OrderData[], 
-    status : Status, 
+    orders : OrderData[],
+    status : Status,
     categories :Category[],
-    singleProduct : Product | null, 
-    singleOrder : SingleOrder[]
+    singleProduct : Product | null,
+    singleOrder : SingleOrder[],
+    coupons : Coupon[],
+    dashboardStats : DashboardStats | null
 
 }
 

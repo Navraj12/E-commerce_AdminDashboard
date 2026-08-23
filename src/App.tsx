@@ -4,25 +4,21 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 import Loader from './common/Loader';
 import PageTitle from './components/PageTitle';
 import SignIn from './pages/Authentication/SignIn';
-import SignUp from './pages/Authentication/SignUp';
-import Calendar from './pages/Calendar';
-import Chart from './pages/Chart';
 import ECommerce from './pages/Dashboard/ECommerce';
-import FormElements from './pages/Form/FormElements';
-import FormLayout from './pages/Form/FormLayout';
-import Profile from './pages/Profile';
-import Settings from './pages/Settings';
 import Tables from './pages/Tables';
-import Alerts from './pages/UiElements/Alerts';
-import Buttons from './pages/UiElements/Buttons';
+import Orders from './pages/Orders';
+import Products from './pages/Products';
+import Categories from './pages/Categories';
+import Users from './pages/Users';
+import Coupons from './pages/Coupons';
 import DefaultLayout from './layout/DefaultLayout';
 import { Provider } from 'react-redux';
 import store from './store/store';
-import AddCategory from './pages/Form/AddCategory';
 import SingleOrder from './pages/SingleOrder';
+import ProtectedRoute from './components/ProtectedRoute';
 import {io} from 'socket.io-client'
 
-export const socket = io("http://localhost:3000",{
+export const socket = io("http://localhost:5000",{
   auth : {
     token : localStorage.getItem('token')
   }
@@ -50,128 +46,92 @@ function App() {
         <Route
           index
           element={
-            <>
-              <PageTitle title="eCommerce Dashboard | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+            <ProtectedRoute>
+              <PageTitle title="eCommerce Dashboard | Admin" />
               <DefaultLayout>
 
               <ECommerce />
               </DefaultLayout>
-            </>
+            </ProtectedRoute>
           }
         />
         <Route
-          path="/calendar"
+          path="/products"
           element={
-            <>
-              <PageTitle title="Calendar | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+            <ProtectedRoute>
+              <PageTitle title="Products | Admin" />
               <DefaultLayout>
-
-              <Calendar />
+                <Products />
               </DefaultLayout>
-            </>
+            </ProtectedRoute>
           }
         />
         <Route
-          path="/profile"
+          path="/categories"
           element={
-            <DefaultLayout>
-              <PageTitle title="Profile | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <Profile />
-             </DefaultLayout>
-          }
-        />
-        <Route
-          path="/forms/form-elements"
-          element={
-            <DefaultLayout> <>
-              <PageTitle title="Form Elements | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <FormElements />
-            </>
-            </DefaultLayout>
-          }
-        />
-        <Route
-          path="/forms/form-layout"
-          element={
-            <>
-              <PageTitle title="Form Layout | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+            <ProtectedRoute>
+              <PageTitle title="Categories | Admin" />
               <DefaultLayout>
-
-              <FormLayout />
+                <Categories />
               </DefaultLayout>
-            </>
+            </ProtectedRoute>
           }
         />
-         <Route
-          path="/forms/add-category"
+        <Route
+          path="/orders"
           element={
-            <>
-              <PageTitle title="Form Layout | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+            <ProtectedRoute>
+              <PageTitle title="Orders | Admin" />
               <DefaultLayout>
-
-              <AddCategory />
+                <Orders />
               </DefaultLayout>
-            </>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute>
+              <PageTitle title="Users | Admin" />
+              <DefaultLayout>
+                <Users />
+              </DefaultLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/coupons"
+          element={
+            <ProtectedRoute>
+              <PageTitle title="Coupons | Admin" />
+              <DefaultLayout>
+                <Coupons />
+              </DefaultLayout>
+            </ProtectedRoute>
           }
         />
         <Route
           path="/tables"
           element={
-            <>
-              <PageTitle title="Tables | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+            <ProtectedRoute>
+              <PageTitle title="Orders | Admin" />
               <DefaultLayout>
 
               <Tables />
               </DefaultLayout>
-            </>
+            </ProtectedRoute>
           }
         />
          <Route
           path="/order/:id"
           element={
-            <>
-              <PageTitle title="Tables | TailAdmin - Tailwind CSS Admin Dashboard Template" />
+            <ProtectedRoute>
+              <PageTitle title="Order Detail | Admin" />
               <DefaultLayout>
 
              <SingleOrder />
               </DefaultLayout>
-            </>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <>
-              <PageTitle title="Settings | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <Settings />
-            </>
-          }
-        />
-        <Route
-          path="/chart"
-          element={
-            <>
-              <PageTitle title="Basic Chart | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <Chart />
-            </>
-          }
-        />
-        <Route
-          path="/ui/alerts"
-          element={
-            <>
-              <PageTitle title="Alerts | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <Alerts />
-            </>
-          }
-        />
-        <Route
-          path="/ui/buttons"
-          element={
-            <>
-              <PageTitle title="Buttons | TailAdmin - Tailwind CSS Admin Dashboard Template" />
-              <Buttons />
-            </>
+            </ProtectedRoute>
           }
         />
         <Route
@@ -183,7 +143,7 @@ function App() {
             </>
           }
         />
-      
+
       </Routes>
      </Provider>
 

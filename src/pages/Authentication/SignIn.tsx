@@ -1,22 +1,21 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from "react"
+import { ChangeEvent, FormEvent, useState } from "react"
 
 import { useAppDispatch, useAppSelector } from "../../store/hooks"
 import { login } from "../../store/authSlice"
-import { Status } from "../../types/status"
 import { useNavigate } from "react-router-dom"
 
 
 
 interface UserDataType{
-  email : string, 
+  email : string,
   password : string
 }
 
 const Login = () => {
   const dispatch = useAppDispatch()
-  const {status} = useAppSelector((state)=>state.auth)
-  console.log(status)
+  const {error} = useAppSelector((state)=>state.auth)
   const navigate = useNavigate()
+  const [submitting, setSubmitting] = useState(false)
 
 
   const [userData,setUserData] = useState<UserDataType>({
@@ -24,23 +23,21 @@ const Login = () => {
     password : ""
   })
   const handleChange = (e:ChangeEvent<HTMLInputElement>)=>{
-    const {name,value} = e.target 
+    const {name,value} = e.target
     setUserData({
-      ...userData, 
+      ...userData,
       [name] : value
     })
   }
-  const handleSubmit = (e:FormEvent<HTMLFormElement>)=>{
+  const handleSubmit = async (e:FormEvent<HTMLFormElement>)=>{
     e.preventDefault()
-   dispatch(login(userData))
-  }
-  useEffect(()=>{
-    if(status === Status.SUCCESS){
+    setSubmitting(true)
+    const result = await dispatch(login(userData))
+    setSubmitting(false)
+    if(result?.success){
       navigate("/")
-    }else{
-      navigate("/login")
     }
-  },[status,dispatch])
+  }
 
   return (
     <>
@@ -72,10 +69,10 @@ const Login = () => {
                     clipRule="evenodd"
                   />
                 </svg>
-                <span>Company</span>
+                <span>Online Karobar Admin</span>
               </h1>
               <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                Welcome, please sign in 
+                Welcome, please sign in
               </h2>
             </header>
             {/* END Header */}
@@ -83,6 +80,11 @@ const Login = () => {
             {/* Sign In Form */}
             <div className="flex flex-col overflow-hidden rounded-lg bg-white shadow-sm dark:bg-gray-800 dark:text-gray-100">
               <div className="grow p-5 md:px-16 md:py-12">
+                {error && (
+                  <div className="mb-4 rounded-lg bg-red-100 px-4 py-3 text-sm text-red-700 dark:bg-red-900/40 dark:text-red-300">
+                    {error}
+                  </div>
+                )}
                 <form className="space-y-6" onSubmit={handleSubmit}>
                   <div className="space-y-1">
                     <label htmlFor="email" className="text-sm font-medium">
@@ -97,7 +99,7 @@ const Login = () => {
                       onChange={handleChange}
                     />
                   </div>
-                 
+
                   <div className="space-y-1">
                     <label htmlFor="password" className="text-sm font-medium">
                       Password
@@ -123,11 +125,12 @@ const Login = () => {
                         />
                         <span className="ml-2 text-sm">Remember me</span>
                       </label>
-                  
+
                     </div>
                     <button
                       type="submit"
-                      className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-blue-700 bg-blue-700 px-6 py-3 font-semibold leading-6 text-white hover:border-blue-600 hover:bg-blue-600 hover:text-white focus:ring focus:ring-blue-400/50 active:border-blue-700 active:bg-blue-700 dark:focus:ring-blue-400/90"
+                      disabled={submitting}
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-blue-700 bg-blue-700 px-6 py-3 font-semibold leading-6 text-white hover:border-blue-600 hover:bg-blue-600 hover:text-white focus:ring focus:ring-blue-400/50 active:border-blue-700 active:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 dark:focus:ring-blue-400/90"
                     >
                       <svg
                         className="hi-mini hi-arrow-uturn-right inline-block size-5 opacity-50"
@@ -142,13 +145,13 @@ const Login = () => {
                           clipRule="evenodd"
                         />
                       </svg>
-                      <span>Sign In</span>
+                      <span>{submitting ? "Signing in..." : "Sign In"}</span>
                     </button>
 
                   </div>
                 </form>
               </div>
-        
+
             </div>
             {/* END Sign In Form */}
 

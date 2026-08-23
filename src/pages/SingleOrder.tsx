@@ -1,13 +1,14 @@
 import React, { ChangeEvent, useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
-import { handleOrderStatusById, singleOrder } from '../store/dataSlice'
+import { deleteOrder, handleOrderStatusById, productImageUrl, singleOrder } from '../store/dataSlice'
 import { OrderStatus } from '../types/data'
 import { socket } from '../App'
 
 const SingleOrder = () => {
     const {id} = useParams()
     const dispatch = useAppDispatch()
+    const navigate = useNavigate()
     const {singleOrder:[order]} = useAppSelector((state)=>state.datas)
     const [orderStatus,setOrderStatus] = useState(order?.Order?.orderStatus as string)
 
@@ -22,14 +23,21 @@ const SingleOrder = () => {
         setOrderStatus(e.target.value)
         if(id) {
           socket.emit('updatedOrderStatus',{
-            status : e.target.value, 
-            orderId : id, 
+            status : e.target.value,
+            orderId : id,
             userId : order.Order.userId
           })
           dispatch(handleOrderStatusById(e.target.value as OrderStatus,id))
         }
-        
 
+
+    }
+
+    const handleDeleteOrder = ()=>{
+        if(order?.Order?.id && confirm('Delete this order?')){
+            dispatch(deleteOrder(order.Order.id))
+            navigate('/tables')
+        }
     }
 
 
@@ -47,8 +55,8 @@ const SingleOrder = () => {
    
               <div className="mt-4 md:mt-6 flex flex-col md:flex-row justify-start items-start md:items-center md:space-x-6 xl:space-x-8 w-full">
               <div className="pb-4 md:pb-8 w-full md:w-40">
-                <img className="w-full hidden md:block"  alt="dress" />
-                <img className="w-full md:hidden" src={order?.Product?.productImageUrl} alt="dress" />
+                <img className="w-full hidden md:block" src={productImageUrl(order?.Product?.productImageUrl)} alt={order?.Product?.productName} />
+                <img className="w-full md:hidden" src={productImageUrl(order?.Product?.productImageUrl)} alt={order?.Product?.productName} />
               </div>
               <div className="border-b border-gray-200 md:flex-row flex-col flex justify-between items-start w-full pb-8 space-y-4 md:space-y-0">
                 <div className="w-full flex flex-col justify-start items-start space-y-8">
@@ -111,9 +119,9 @@ const SingleOrder = () => {
           <div className="flex justify-between xl:h-full items-stretch w-full flex-col mt-6 md:mt-0">
             <div className="flex justify-center md:justify-start xl:flex-col flex-col md:space-x-6 lg:space-x-8 xl:space-x-0 space-y-4 xl:space-y-12 md:space-y-0 md:flex-row items-center md:items-start">
               <div className="flex justify-center md:justify-start items-center md:items-start flex-col space-y-4 xl:mt-8">
-              <p className="w-48 lg:w-full dark:text-gray-300 xl:w-48 text-center md:text-left text-sm leading-5 text-gray-600">UserName : test</p>
-                <p className="text-base dark:text-white font-semibold leading-4 text-center md:text-left text-gray-800">Address : itahari</p>
-                <p className="w-48 lg:w-full dark:text-gray-300 xl:w-48 text-center md:text-left text-sm leading-5 text-gray-600">Phone : 9123123</p>
+              <p className="w-48 lg:w-full dark:text-gray-300 xl:w-48 text-center md:text-left text-sm leading-5 text-gray-600">UserName : {order?.Order?.User?.username ?? '-'}</p>
+                <p className="text-base dark:text-white font-semibold leading-4 text-center md:text-left text-gray-800">Address : {order?.Order?.shippingAddress ?? '-'}</p>
+                <p className="w-48 lg:w-full dark:text-gray-300 xl:w-48 text-center md:text-left text-sm leading-5 text-gray-600">Phone : {order?.Order?.phoneNumber ?? '-'}</p>
               </div>
 
             </div>
@@ -149,7 +157,7 @@ const SingleOrder = () => {
             </div>
       
             <div className="flex w-full justify-center items-center md:justify-start md:items-start">
-              <button className="mt-6 md:mt-0 dark:border-white dark:hover:bg-gray-900 dark:bg-transparent dark:text-white py-3 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 border border-gray-800 font-medium w-96 2xl:w-full text-base font-medium leading-4 text-gray-800" style={{marginTop:'10px',backgroundColor:'red',color:'white'}} >Delete Order</button>
+              <button onClick={handleDeleteOrder} className="mt-6 md:mt-0 dark:border-white dark:hover:bg-gray-900 dark:bg-transparent dark:text-white py-3 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 border border-gray-800 font-medium w-96 2xl:w-full text-base font-medium leading-4 text-gray-800" style={{marginTop:'10px',backgroundColor:'red',color:'white'}} >Delete Order</button>
   
             </div>
               

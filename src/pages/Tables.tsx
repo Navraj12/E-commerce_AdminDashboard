@@ -1,22 +1,9 @@
-import Breadcrumb from '../components/Breadcrumbs/Breadcrumb';
-import TableFour from '../components/Tables/TableFour';
-import TableOne from '../components/Tables/TableOne';
-import TableThree from '../components/Tables/TableThree';
-import TableTwo from '../components/Tables/TableTwo';
+import Orders from './Orders';
 
+// Historically this page showed the TailAdmin demo tables; it now hosts the
+// real orders list wired to the backend.
 const Tables = () => {
-  return (
-    <>
-      <Breadcrumb pageName="Tables" />
-
-      <div className="flex flex-col gap-10">
-        <TableOne />
-        <TableTwo />
-        <TableThree />
-        <TableFour />
-      </div>
-    </>
-  );
+  return <Orders />;
 };
 
 export default Tables;

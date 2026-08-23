@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import CardDataStats from '../../components/CardDataStats';
 import ChartOne from '../../components/Charts/ChartOne';
 import ChartThree from '../../components/Charts/ChartThree';
@@ -6,14 +6,22 @@ import ChartTwo from '../../components/Charts/ChartTwo';
 import ChatCard from '../../components/Chat/ChatCard';
 import MapOne from '../../components/Maps/MapOne';
 import TableOne from '../../components/Tables/TableOne';
-import { useAppSelector } from '../../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { fetchDashboardStats } from '../../store/dataSlice';
 
 const ECommerce: React.FC = () => {
-const {orders,products,users} = useAppSelector((state)=>state.datas)
-const counts = { 
-  ordersCount : orders.length, 
-  usersCount : users.length, 
-  productsCount: products.length
+const dispatch = useAppDispatch()
+const {dashboardStats} = useAppSelector((state)=>state.datas)
+
+useEffect(()=>{
+  dispatch(fetchDashboardStats())
+},[])
+
+const counts = {
+  ordersCount : dashboardStats?.totalOrders ?? 0,
+  usersCount : dashboardStats?.totalUsers ?? 0,
+  productsCount: dashboardStats?.totalProducts ?? 0,
+  totalRevenue: dashboardStats?.totalRevenue ?? 0
 }
   return (
     <>
@@ -79,7 +87,22 @@ const counts = {
             />
           </svg>
         </CardDataStats>
-   
+        <CardDataStats title="Total Revenue" total={counts.totalRevenue} levelUp>
+          <svg
+            className="fill-primary dark:fill-white"
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M10 1.5C5.30558 1.5 1.5 5.30558 1.5 10C1.5 14.6944 5.30558 18.5 10 18.5C14.6944 18.5 18.5 14.6944 18.5 10C18.5 5.30558 14.6944 1.5 10 1.5ZM10.75 14.5V15.25H9.25V14.5C7.86929 14.5 6.75 13.3807 6.75 12H8.25C8.25 12.5523 8.69772 13 9.25 13H10.5C11.0523 13 11.5 12.5523 11.5 12C11.5 11.4477 11.0523 11 10.5 11H9.5C8.11929 11 7 9.88071 7 8.5C7 7.11929 8.11929 6 9.5 6V5.25H11V6C12.1046 6 13 6.89543 13 8H11.5C11.5 7.72386 11.2761 7.5 11 7.5H9.5C8.94772 7.5 8.5 7.94772 8.5 8.5C8.5 9.05228 8.94772 9.5 9.5 9.5H10.5C11.8807 9.5 13 10.6193 13 12C13 13.3807 11.8807 14.5 10.75 14.5Z"
+              fill=""
+            />
+          </svg>
+        </CardDataStats>
+
       </div>
 
       <div className="mt-4 grid grid-cols-12 gap-4 md:mt-6 md:gap-6 2xl:mt-7.5 2xl:gap-7.5">
