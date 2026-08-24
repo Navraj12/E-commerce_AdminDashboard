@@ -82,10 +82,12 @@ const Products = () => {
       alert('Original price must be greater than the current price');
       return;
     }
-    if (editingId) {
-      await dispatch(updateProduct(editingId, form));
-    } else {
-      await dispatch(addProduct(form));
+    const result = editingId
+      ? await dispatch(updateProduct(editingId, form))
+      : await dispatch(addProduct(form));
+    if (!result?.success) {
+      alert(result?.message ?? 'Something went wrong. Please try again.');
+      return;
     }
     setShowForm(false);
     setForm(emptyForm);
@@ -93,10 +95,13 @@ const Products = () => {
     dispatch(fetchProducts());
   };
 
-  const handleDelete = (id?: string) => {
+  const handleDelete = async (id?: string) => {
     if (!id) return;
     if (confirm('Delete this product?')) {
-      dispatch(deleteProduct(id));
+      const result = await dispatch(deleteProduct(id));
+      if (!result?.success) {
+        alert(result?.message ?? 'Failed to delete product. Please try again.');
+      }
     }
   };
 

@@ -1,19 +1,25 @@
 
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { useEffect } from 'react';
-import { deleteUser, fetchUsers, setDeleteUser } from '../../store/dataSlice';
+import { useNavigate } from 'react-router-dom';
+import { deleteUser, fetchUsers, updateUserRole } from '../../store/dataSlice';
 
 
 
 const TableOne = () => {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const {users} = useAppSelector((state)=>state.datas)
   useEffect(()=>{
     dispatch(fetchUsers())
   },[])
   const handleDelete  = (id:string)=>{
     dispatch(deleteUser(id))
-  
+
+  }
+  const handleRoleToggle = (id:string, currentRole?:string)=>{
+    const nextRole = currentRole === 'admin' ? 'customer' : 'admin'
+    dispatch(updateUserRole(id, nextRole))
   }
   return (
     <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
@@ -72,7 +78,7 @@ const TableOne = () => {
 
             <td className="border-b border-[#eee] ml-20 py-5 px-4 dark:border-strokedark">
                   <div className="flex items-center space-x-3.5">
-                    <button className="hover:text-primary">
+                    <button onClick={()=>navigate('/users')} title="View all users" className="hover:text-primary">
                       <svg
                         className="fill-current"
                         width="18"
@@ -118,7 +124,7 @@ const TableOne = () => {
                         />
                       </svg>
                     </button>
-                    <button className="hover:text-primary">
+                    <button onClick={()=>handleRoleToggle(user.id, user.role)} title={user.role === 'admin' ? 'Make customer' : 'Make admin'} className="hover:text-primary">
                       <svg
                         className="fill-current"
                         width="18"

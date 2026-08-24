@@ -20,9 +20,12 @@ const Orders = () => {
     dispatch(fetchOrders());
   }, []);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Delete this order?')) {
-      dispatch(deleteOrder(id));
+      const result = await dispatch(deleteOrder(id));
+      if (!result?.success) {
+        alert(result?.message ?? 'Failed to delete order. Please try again.');
+      }
     }
   };
 

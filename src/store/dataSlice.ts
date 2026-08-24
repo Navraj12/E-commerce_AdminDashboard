@@ -98,6 +98,12 @@ const dataSlice = createSlice({
                 state.singleOrder[index].Order.orderStatus = action.payload.status
             }
         },
+        updatePaymentStatusById(state:InititalState,action:PayloadAction<{orderId : string, paymentStatus : string}>){
+           const index =  state.singleOrder.findIndex(order=>order.id===action.payload.orderId)
+            if(index !== -1 && state.singleOrder[index].Order.Payment){
+                state.singleOrder[index].Order.Payment.paymentStatus = action.payload.paymentStatus
+            }
+        },
         setUserRole(state:InititalState,action:PayloadAction<{userId:string,role:string}>){
             const index = state.users.findIndex(u=>u.id===action.payload.userId)
             if(index !== -1) state.users[index].role = action.payload.role
@@ -118,7 +124,7 @@ const dataSlice = createSlice({
     }
 })
 
-export const {setOrders,setCategories,setSingleOrder,updateOrderStatusById, setDeleteCategory,setProduct,setStatus,setUsers,setSingleProduct,setDeleteProduct,setDeleteUser,setDeleteOrder,setUserRole,setCoupons,addCouponToState,setDeleteCoupon,setDashboardStats} = dataSlice.actions
+export const {setOrders,setCategories,setSingleOrder,updateOrderStatusById,updatePaymentStatusById, setDeleteCategory,setProduct,setStatus,setUsers,setSingleProduct,setDeleteProduct,setDeleteUser,setDeleteOrder,setUserRole,setCoupons,addCouponToState,setDeleteCoupon,setDashboardStats} = dataSlice.actions
 export default dataSlice.reducer
 
 
@@ -184,11 +190,14 @@ export function updateUserRole(id:string,role:string){
             if(response.status === 200){
                 dispatch(setStatus(Status.SUCCESS))
                 dispatch(setUserRole({userId:id,role}))
+                return { success: true as const }
             }else{
                 dispatch(setStatus(Status.ERROR))
+                return { success: false as const, message: 'Failed to update role' }
             }
-        } catch (error) {
+        } catch (error:any) {
             dispatch(setStatus(Status.ERROR))
+            return { success: false as const, message: error?.response?.data?.message ?? 'Failed to update role' }
         }
     }
 }
@@ -222,11 +231,14 @@ export function addProduct(data:AddProduct){
             })
             if(response.status === 200){
                 dispatch(setStatus(Status.SUCCESS))
+                return { success: true as const }
             }else{
                 dispatch(setStatus(Status.ERROR))
+                return { success: false as const, message: 'Failed to add product' }
             }
-        } catch (error) {
+        } catch (error:any) {
             dispatch(setStatus(Status.ERROR))
+            return { success: false as const, message: error?.response?.data?.message ?? 'Failed to add product' }
         }
     }
 }
@@ -242,11 +254,14 @@ export function updateProduct(id:string,data:AddProduct){
             })
             if(response.status === 200){
                 dispatch(setStatus(Status.SUCCESS))
+                return { success: true as const }
             }else{
                 dispatch(setStatus(Status.ERROR))
+                return { success: false as const, message: 'Failed to update product' }
             }
-        } catch (error) {
+        } catch (error:any) {
             dispatch(setStatus(Status.ERROR))
+            return { success: false as const, message: error?.response?.data?.message ?? 'Failed to update product' }
         }
     }
 }
@@ -259,11 +274,14 @@ export function addCategory(data:{categoryName : string, categoryIcon? : string}
             if(response.status === 200){
                 dispatch(setStatus(Status.SUCCESS))
                 dispatch(fetchCaetgories() as any)
+                return { success: true as const }
             }else{
                 dispatch(setStatus(Status.ERROR))
+                return { success: false as const, message: 'Failed to add category' }
             }
-        } catch (error) {
+        } catch (error:any) {
             dispatch(setStatus(Status.ERROR))
+            return { success: false as const, message: error?.response?.data?.message ?? 'Failed to add category' }
         }
     }
 }
@@ -293,12 +311,14 @@ export function deleteProduct(id:string){
             if(response.status === 200){
                 dispatch(setStatus(Status.SUCCESS))
                 dispatch(setDeleteProduct({productId:id}))
-
+                return { success: true as const }
             }else{
                 dispatch(setStatus(Status.ERROR))
+                return { success: false as const, message: 'Failed to delete product' }
             }
-        } catch (error) {
+        } catch (error:any) {
             dispatch(setStatus(Status.ERROR))
+            return { success: false as const, message: error?.response?.data?.message ?? 'Failed to delete product' }
         }
     }
 }
@@ -310,13 +330,15 @@ export function deleteUser(id:string){
             if(response.status === 200){
                 dispatch(setStatus(Status.SUCCESS))
                 dispatch(setDeleteUser({userId:id}))
-
+                return { success: true as const }
 
             }else{
                 dispatch(setStatus(Status.ERROR))
+                return { success: false as const, message: 'Failed to delete user' }
             }
-        } catch (error) {
+        } catch (error:any) {
             dispatch(setStatus(Status.ERROR))
+            return { success: false as const, message: error?.response?.data?.message ?? 'Failed to delete user' }
         }
     }
 }
@@ -330,11 +352,14 @@ export function deleteOrder(id:string){
             if(response.status === 200){
                 dispatch(setStatus(Status.SUCCESS))
                 dispatch(setDeleteOrder({orderId : id}))
+                return { success: true as const }
             }else{
                 dispatch(setStatus(Status.ERROR))
+                return { success: false as const, message: 'Failed to delete order' }
             }
-        } catch (error) {
+        } catch (error:any) {
             dispatch(setStatus(Status.ERROR))
+            return { success: false as const, message: error?.response?.data?.message ?? 'Failed to delete order' }
         }
     }
 }
@@ -346,11 +371,14 @@ export function deleteCategory(id:string){
             if(response.status === 200){
                 dispatch(setStatus(Status.SUCCESS))
                 dispatch(setDeleteCategory({categoryId : id}))
+                return { success: true as const }
             }else{
                 dispatch(setStatus(Status.ERROR))
+                return { success: false as const, message: 'Failed to delete category' }
             }
-        } catch (error) {
+        } catch (error:any) {
             dispatch(setStatus(Status.ERROR))
+            return { success: false as const, message: error?.response?.data?.message ?? 'Failed to delete category' }
         }
     }
 }
@@ -408,6 +436,23 @@ export function handleOrderStatusById(status:OrderStatus,id:string){
     }
 }
 
+export function handlePaymentStatusById(paymentStatus:string,id:string){
+    return async function handlePaymentStatusThunk(dispatch : AppDispatch){
+        dispatch(setStatus(Status.LOADING))
+        try {
+            const response = await APIAuthenticated.patch('/order/admin/payment/' + id,{paymentStatus})
+            if(response.status === 200){
+                dispatch(setStatus(Status.SUCCESS))
+                dispatch(updatePaymentStatusById({orderId:id,paymentStatus}))
+            }else{
+                dispatch(setStatus(Status.ERROR))
+            }
+        } catch (error) {
+            dispatch(setStatus(Status.ERROR))
+        }
+    }
+}
+
 export function fetchCoupons(){
     return async function fetchCouponsThunk(dispatch : AppDispatch){
         dispatch(setStatus(Status.LOADING))
@@ -433,11 +478,14 @@ export function addCoupon(data:{code:string,discountPercent:number,expiryDate:st
             if(response.status === 200){
                 dispatch(setStatus(Status.SUCCESS))
                 dispatch(addCouponToState(response.data.data))
+                return { success: true as const }
             }else{
                 dispatch(setStatus(Status.ERROR))
+                return { success: false as const, message: 'Failed to add coupon' }
             }
-        } catch (error) {
+        } catch (error:any) {
             dispatch(setStatus(Status.ERROR))
+            return { success: false as const, message: error?.response?.data?.message ?? 'Failed to add coupon' }
         }
     }
 }
@@ -450,11 +498,14 @@ export function deleteCoupon(id:string){
             if(response.status === 200){
                 dispatch(setStatus(Status.SUCCESS))
                 dispatch(setDeleteCoupon({couponId:id}))
+                return { success: true as const }
             }else{
                 dispatch(setStatus(Status.ERROR))
+                return { success: false as const, message: 'Failed to delete coupon' }
             }
-        } catch (error) {
+        } catch (error:any) {
             dispatch(setStatus(Status.ERROR))
+            return { success: false as const, message: error?.response?.data?.message ?? 'Failed to delete coupon' }
         }
     }
 }

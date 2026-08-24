@@ -24,14 +24,23 @@ const Categories = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!categoryName.trim()) return;
-    await dispatch(addCategory({ categoryName, categoryIcon: categoryIcon.trim() || undefined }));
+    const result = await dispatch(
+      addCategory({ categoryName, categoryIcon: categoryIcon.trim() || undefined })
+    );
+    if (!result?.success) {
+      alert(result?.message ?? 'Failed to add category. Please try again.');
+      return;
+    }
     setCategoryName('');
     setCategoryIcon('');
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Delete this category?')) {
-      dispatch(deleteCategory(id));
+      const result = await dispatch(deleteCategory(id));
+      if (!result?.success) {
+        alert(result?.message ?? 'Failed to delete category. Please try again.');
+      }
     }
   };
 

@@ -36,7 +36,11 @@ const Coupons = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await dispatch(
+    if (!form.code.trim() || Number(form.discountPercent) <= 0 || Number(form.discountPercent) > 100) {
+      alert('Please enter a valid code and a discount percent between 1 and 100.');
+      return;
+    }
+    const result = await dispatch(
       addCoupon({
         code: form.code,
         discountPercent: Number(form.discountPercent),
@@ -44,12 +48,19 @@ const Coupons = () => {
         active: form.active,
       })
     );
+    if (!result?.success) {
+      alert(result?.message ?? 'Failed to add coupon. Please try again.');
+      return;
+    }
     setForm(emptyForm);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Delete this coupon?')) {
-      dispatch(deleteCoupon(id));
+      const result = await dispatch(deleteCoupon(id));
+      if (!result?.success) {
+        alert(result?.message ?? 'Failed to delete coupon. Please try again.');
+      }
     }
   };
 

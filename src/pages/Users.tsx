@@ -11,15 +11,22 @@ const Users = () => {
     dispatch(fetchUsers());
   }, []);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (confirm('Delete this user?')) {
-      dispatch(deleteUser(id));
+      const result = await dispatch(deleteUser(id));
+      if (!result?.success) {
+        alert(result?.message ?? 'Failed to delete user. Please try again.');
+      }
     }
   };
 
-  const handleRoleToggle = (id: string, currentRole?: string) => {
+  const handleRoleToggle = async (id: string, currentRole?: string) => {
     const nextRole = currentRole === 'admin' ? 'customer' : 'admin';
-    dispatch(updateUserRole(id, nextRole));
+    if (!confirm(`Change this user's role to ${nextRole}?`)) return;
+    const result = await dispatch(updateUserRole(id, nextRole));
+    if (!result?.success) {
+      alert(result?.message ?? 'Failed to update role. Please try again.');
+    }
   };
 
   return (

@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
-import { deleteOrder, handleOrderStatusById, productImageUrl, singleOrder } from '../store/dataSlice'
+import { deleteOrder, handleOrderStatusById, handlePaymentStatusById, productImageUrl, singleOrder } from '../store/dataSlice'
 import { OrderStatus } from '../types/data'
 import { socket } from '../App'
 
@@ -33,10 +33,20 @@ const SingleOrder = () => {
 
     }
 
-    const handleDeleteOrder = ()=>{
+    const handleDeleteOrder = async ()=>{
         if(order?.Order?.id && confirm('Delete this order?')){
-            dispatch(deleteOrder(order.Order.id))
+            const result = await dispatch(deleteOrder(order.Order.id))
+            if(!result?.success){
+                alert(result?.message ?? 'Failed to delete order. Please try again.')
+                return
+            }
             navigate('/tables')
+        }
+    }
+
+    const handlePaymentStatus = (e:ChangeEvent<HTMLSelectElement>)=>{
+        if(id) {
+          dispatch(handlePaymentStatusById(e.target.value,id))
         }
     }
 
@@ -144,8 +154,8 @@ const SingleOrder = () => {
 
           <div>
           <label htmlFor="countries" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select Payment Status</label>
-          <select id="countries" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-     
+          <select id="countries" defaultValue={order?.Order?.Payment?.paymentStatus} className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" onChange={handlePaymentStatus}>
+
           <option value="pending">pending</option>
           <option value="paid">paid</option>
           <option value="unpaid">unpaid</option>
